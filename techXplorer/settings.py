@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_yasg',
-    'accounts.apps.AccountsConfig'
+    'accounts.apps.AccountsConfig',
+    'donations.apps.DonationsConfig',
 ]
 
 # JWT Settings
