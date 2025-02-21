@@ -22,4 +22,4 @@ staticfiles/
 # Ignore environment variables
 .env
 
-.idea
+.idea/
