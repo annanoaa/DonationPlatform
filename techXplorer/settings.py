@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'accounts.apps.AccountsConfig',
     'donations.apps.DonationsConfig',
+    'payments.apps.PaymentsConfig',
 ]
 
 # JWT Settings

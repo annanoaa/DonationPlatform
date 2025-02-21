@@ -3,7 +3,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
 from .models import DonationRequest, Donation
-from .serializers import DonationRequestSerializer, DonationSerializer
+from .serializers import (
+    DonationRequestSerializer,
+    DonationSerializer,
+    DonationActionSerializer
+)
 
 
 class DonationRequestViewSet(viewsets.ModelViewSet):
@@ -18,32 +22,24 @@ class DonationRequestViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        # Set the beneficiary as the current authenticated user
         serializer.save(beneficiary=self.request.user)
 
     @action(detail=True, methods=['post'])
     def donate(self, request, pk=None):
+        """
+        Make a donation to this request.
+        """
         donation_request = self.get_object()
 
-        amount = request.data.get('amount')
-        if not amount:
+        # Use the new serializer for validation
+        serializer = DonationActionSerializer(data=request.data)
+        if not serializer.is_valid():
             return Response(
-                {'error': 'Amount is required'},
+                serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        try:
-            amount = float(amount)
-            if amount <= 0:
-                return Response(
-                    {'error': 'Amount must be greater than 0'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-        except (TypeError, ValueError):
-            return Response(
-                {'error': 'Invalid amount'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        amount = serializer.validated_data['amount']
 
         # Check if the donation request is active
         if donation_request.status != 'ACTIVE':
