@@ -17,13 +17,23 @@ class DonationRequestViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(category=category)
         return queryset
 
+    def perform_create(self, serializer):
+        # Set the beneficiary as the current authenticated user
+        serializer.save(beneficiary=self.request.user)
+
     @action(detail=True, methods=['post'])
     def donate(self, request, pk=None):
         donation_request = self.get_object()
 
-        # Validate the amount
+        amount = request.data.get('amount')
+        if not amount:
+            return Response(
+                {'error': 'Amount is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         try:
-            amount = float(request.data.get('amount', 0))
+            amount = float(amount)
             if amount <= 0:
                 return Response(
                     {'error': 'Amount must be greater than 0'},
@@ -35,22 +45,22 @@ class DonationRequestViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # Check if the donation request is active
+        if donation_request.status != 'ACTIVE':
+            return Response(
+                {'error': 'This donation request is not active'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         # Create donation
-        donation = Donation(
+        donation = Donation.objects.create(
             donor=request.user,
             donation_request=donation_request,
             amount=amount
         )
 
-        try:
-            donation.save()
-            return Response({
-                'status': 'success',
-                'message': f'Successfully donated {amount} to {donation_request.title}',
-                'remaining_amount': donation_request.remaining_amount()
-            }, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                {'error': str(e)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        return Response({
+            'status': 'success',
+            'message': f'Successfully donated {amount} to {donation_request.title}',
+            'remaining_amount': donation_request.remaining_amount()
+        }, status=status.HTTP_201_CREATED)
