@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_yasg',
+    'drf_spectacular',
     'accounts.apps.AccountsConfig',
     'donations.apps.DonationsConfig',
     'payments.apps.PaymentsConfig',
@@ -50,6 +51,13 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Donation Platform API',
+    'DESCRIPTION': 'API for managing donations and donation requests',
+    'VERSION': '1.0.0',
 }
 
 from datetime import timedelta
@@ -153,7 +161,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # This is where collectstatic will collect files
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+
+# Make sure the static directory exists
+if not os.path.exists(os.path.join(BASE_DIR, 'static')):
+    os.makedirs(os.path.join(BASE_DIR, 'static'))
+
+if not os.path.exists(os.path.join(BASE_DIR, 'staticfiles')):
+    os.makedirs(os.path.join(BASE_DIR, 'staticfiles'))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

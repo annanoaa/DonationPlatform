@@ -3,15 +3,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
 from .models import DonationRequest, Donation
-from .serializers import (
-    DonationRequestSerializer,
-    DonationSerializer,
-    DonationActionSerializer
-)
-
+from .serializers import DonationRequestSerializer, DonationSerializer, DonationActionSerializer
+from drf_spectacular.utils import extend_schema
 
 class DonationRequestViewSet(viewsets.ModelViewSet):
-    serializer_class = DonationRequestSerializer
+    serializer_class = DonationActionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -24,14 +20,33 @@ class DonationRequestViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(beneficiary=self.request.user)
 
+    @extend_schema(
+        request=DonationActionSerializer,
+        responses={
+            201: {
+                "type": "object",
+                "properties": {
+                    "status": {"type": "string"},
+                    "message": {"type": "string"},
+                    "remaining_amount": {"type": "number"}
+                }
+            },
+            400: {
+                "type": "object",
+                "properties": {
+                    "error": {"type": "string"}
+                }
+            }
+        },
+        description="Make a donation to a specific donation request"
+    )
     @action(detail=True, methods=['post'])
     def donate(self, request, pk=None):
         """
-        Make a donation to this request.
-        """
+                Make a donation to this request.
+                """
         donation_request = self.get_object()
 
-        # Use the new serializer for validation
         serializer = DonationActionSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(
