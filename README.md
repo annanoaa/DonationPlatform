@@ -1,67 +1,97 @@
-# TechXplorer
+# DonationPlatform
 
-TechXplorer is a Django-based web application developed for the **TechXplor Hackathon**, focusing on **digital banking, fintech, and ESG** solutions.
+A comprehensive platform for managing donations and payments with integrated technical exploration features.
+
+## Project Structure
+
+The project is organized into the following main modules:
+
+- **accounts/** - User account management and authentication
+- **donations/** - Donation processing and management
+- **payments/** - Payment processing and transaction handling
+- **techXplorer/** - Technical exploration and analysis tools
 
 ## Features
-- **User Authentication**: Secure sign-up and login system.
-- **Banking Features**: Implements basic fintech operations.
-- **ESG Compliance**: Integrates sustainable finance practices.
-- **Responsive UI**: Built with Django templates and Bootstrap.
 
-## Installation
+- User account management and authentication
+- Secure donation processing
+- Multiple payment method support
+- Technical exploration tools
+- Real-time transaction tracking
+- Donation history and reporting
 
-### Prerequisites
-Ensure you have Python and Git installed on your system.
+## Requirements
 
+See [requirements.txt](requirements.txt) for a full list of dependencies.
+
+## Setup and Installation
+
+1. Clone the repository:
 ```bash
-python --version  # Ensure Python 3.x is installed
-git --version  # Ensure Git is installed
+git clone https://github.com/annanoaa/DonationPlatform.git
+cd DonationPlatform
 ```
 
-### Clone the Repository
+2. Create and activate a virtual environment:
 ```bash
-git clone https://github.com/yourusername/techxplorer.git
-cd techxplorer
+python -m venv venv
+source venv/bin/activate  # On Windows use: venv\Scripts\activate
 ```
 
-### Create and Activate a Virtual Environment
-```bash
-python -m venv .venv  # Create virtual environment
-source .venv/bin/activate  # On macOS/Linux
-.venv\Scripts\activate  # On Windows
-```
-
-### Install Dependencies
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-### Run Migrations
-```bash
-python manage.py migrate
-```
+4. Configure environment variables:
+   - Create a `.env` file in the root directory
+   - Add necessary configuration variables (see `.env.example`)
 
-### Start the Development Server
+## Usage
+
+1. Start the application:
 ```bash
 python manage.py runserver
 ```
-The project will be accessible at **http://127.0.0.1:8000/**
 
-## Usage
-- **Register/Login** to access fintech features.
-- **Perform financial transactions** securely.
-- **Monitor ESG compliance** through reports and analytics.
+2. Access the platform at `http://localhost:8000`
+
+## Module Description
+
+### Accounts Module
+- User registration and authentication
+- Profile management
+- Authorization and permissions
+
+### Donations Module
+- Donation processing
+- Campaign management
+- Donor tracking
+
+### Payments Module
+- Payment processing
+- Transaction management
+- Financial reporting
+
+### TechXplorer Module
+- Technical analysis tools
+- System monitoring
+- Performance metrics
 
 ## Contributing
-1. Fork the repository.
-2. Create a new branch: `git checkout -b feature-name`.
-3. Commit changes: `git commit -m "Added new feature"`.
-4. Push to the branch: `git push origin feature-name`.
-5. Open a pull request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## License
+
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contact
-For any inquiries, reach out to **Anna Arnania** at [your-email@example.com].
 
+Anna - [@annanoaa](https://github.com/annanoaa)
+
+Project Link: [https://github.com/annanoaa/DonationPlatform](https://github.com/annanoaa/DonationPlatform)
