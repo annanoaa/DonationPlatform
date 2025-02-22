@@ -85,6 +85,9 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = UserSerializer
 
+    def get_object(self):
+        return self.request.user
+
     @swagger_auto_schema(
         operation_summary="Get user profile",
         operation_description="Retrieve the profile of the currently authenticated user",

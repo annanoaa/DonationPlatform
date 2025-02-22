@@ -1,7 +1,7 @@
 from django.utils import timezone
 from rest_framework import serializers
 from .models import DonationRequest, Donation
-from decimal import Decimal  # Add this import
+from decimal import Decimal
 
 class DonationActionSerializer(serializers.Serializer):
     amount = serializers.DecimalField(
@@ -10,6 +10,7 @@ class DonationActionSerializer(serializers.Serializer):
         min_value=Decimal('0.01'),
         help_text="Amount to donate"
     )
+
 class DonationRequestSerializer(serializers.ModelSerializer):
     remaining_amount = serializers.DecimalField(
         max_digits=10,

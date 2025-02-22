@@ -1,4 +1,6 @@
-from django.db import models
+from decimal import Decimal
+
+from django.db import models, transaction
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.utils import timezone
@@ -53,16 +55,19 @@ class DonationRequest(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def remaining_amount(self):
-        return max(0, self.target_amount - self.collected_amount)
+        # Return a Decimal value (not int)
+        remaining = self.target_amount - self.collected_amount
+        return max(Decimal('0'), remaining)
 
     def is_expired(self):
         return timezone.now() > self.deadline
 
     def save(self, *args, **kwargs):
-        if self.is_expired() and self.status == 'ACTIVE':
-            self.status = 'EXPIRED'
+        # Check for completion FIRST, then expiration
         if self.collected_amount >= self.target_amount and self.status == 'ACTIVE':
             self.status = 'COMPLETED'
+        elif self.is_expired() and self.status == 'ACTIVE':
+            self.status = 'EXPIRED'
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -88,17 +93,26 @@ class Donation(models.Model):
 
     def clean(self):
         from django.core.exceptions import ValidationError
+        # Existing validations
         if self.donor == self.donation_request.beneficiary:
             raise ValidationError("Beneficiaries cannot donate to their own requests.")
         if self.donation_request.status != 'ACTIVE':
             raise ValidationError("Cannot donate to non-active requests.")
+        # New validation: Check donor's balance
+        if self.donor.account_balance < self.amount:
+            raise ValidationError("Insufficient funds to make this donation.")
 
     def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
-        # Update the collected amount in the donation request
-        self.donation_request.collected_amount += self.amount
-        self.donation_request.save()
+        with transaction.atomic():  # Ensure atomic transaction
+            self.clean()  # Validate before saving
+            # Deduct amount from donor's balance
+            self.donor.account_balance -= self.amount
+            self.donor.save()
+            # Save the donation
+            super().save(*args, **kwargs)
+            # Update donation request's collected amount
+            self.donation_request.collected_amount += self.amount
+            self.donation_request.save()
 
     def __str__(self):
         return f"{self.donor.email} donated {self.amount} to {self.donation_request.title}"

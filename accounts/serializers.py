@@ -7,7 +7,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'account_balance')
+        fields = ('id', 'email', 'username', 'account_balance')
         read_only_fields = ('account_balance',)
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -17,7 +17,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'password2')
+        fields = ('email', 'username', 'password', 'password2')
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -30,7 +30,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         password = validated_data.pop('password')
         user = User.objects.create_user(
             email=validated_data['email'],
-            username=validated_data['email'],  # Set username same as email
+            username=validated_data['username'],
             password=password
         )
         return user

@@ -7,8 +7,14 @@ from .serializers import DonationRequestSerializer, DonationSerializer, Donation
 from drf_spectacular.utils import extend_schema
 
 class DonationRequestViewSet(viewsets.ModelViewSet):
-    serializer_class = DonationActionSerializer
+    queryset = DonationRequest.objects.all()
     permission_classes = [permissions.IsAuthenticated]
+
+    # Dynamic serializer selection
+    def get_serializer_class(self):
+        if self.action == 'donate':
+            return DonationActionSerializer
+        return DonationRequestSerializer
 
     def get_queryset(self):
         queryset = DonationRequest.objects.filter(status='ACTIVE')
@@ -43,8 +49,8 @@ class DonationRequestViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def donate(self, request, pk=None):
         """
-                Make a donation to this request.
-                """
+        Make a donation to this request.
+        """
         donation_request = self.get_object()
 
         serializer = DonationActionSerializer(data=request.data)
